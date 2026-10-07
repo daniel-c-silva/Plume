@@ -1,10 +1,10 @@
 import psycopg2
 
 DB_config = {
-    "dbname": "plumedata",
-    "user": "app_user",
-    "password": "user_password",
-    "host": "localhost"
+    "host": "localhost",
+    "port":"5433",
+    "database": "postgres",
+    "user": "postgres" 
 }
 
 def init_db():
@@ -12,13 +12,13 @@ def init_db():
     cursor = conn.cursor()
 
     # ? users table
-    cursor.exectue(
+    cursor.execute(
         '''
     CREATE TABLE IF NOT EXISTS "user"(
         id  SERIAL PRIMARY KEY,
         username    TEXT UNIQUE NOT NULL,
         password_hash   TEXT NOT NULL,
-        questions_answered  INTERGER DEFAULT 0 NOT NULL
+        questions_answered  INTEGER DEFAULT 0 NOT NULL
         );
         '''
     )
@@ -27,7 +27,7 @@ def init_db():
         '''
     CREATE TABLE IF NOT EXISTS "answers"(
         id  SERIAL PRIMARY KEY,
-        user_id INTERGER REFERENCES "user"(id) DELETE ON CASCADE,
+        user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
         question TEXT NOT NULL,
         user_answer TEXT NOT NULL
         );
