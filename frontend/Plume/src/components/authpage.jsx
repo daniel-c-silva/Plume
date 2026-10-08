@@ -1,0 +1,75 @@
+import { useState } from "react";
+import Register from "./register";
+
+export default function Authpage() 
+{
+    const   [username, setUserName] = useState('');
+    const   [password, setPassword] = useState('');
+    const   [message, setMessage] = useState('');
+    const   [page, setPage] = useState('login');
+
+    const   handleSubmit = async (currentVal) => {
+        currentVal.preventDefault();
+
+        const   response = await fetch('http://127.0.0.1:5000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( {username, password}),
+        })
+
+        const   data = await response.json();
+        setMessage(data.message || data.error);
+    }
+
+
+    if  (page === 'register')
+    {
+        return <Register/>;
+    }
+
+return (
+    <div className="login-cont">
+        <h1>Login</h1>
+        <form onSubmit={handleSubmit} className="login-form">
+
+            <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input 
+                id="username"
+                type="text"
+                placeholder="Enter your username: ex... berpinhe"
+                value={username}
+                onChange={(currentVal) => setUserName(currentVal.target.value)}
+                required
+                />
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input 
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(currentVal) => setPassword(currentVal.target.value)}
+                required
+                />
+            </div>
+
+            <button type="submit" className="submit-button">Submit</button>
+
+        </form>
+        {message && <p className="feedback-message">{message}</p>}
+
+        <hr />
+
+        <p>Don't Have an account?</p>
+        <button onClick={() => setPage('register')}>
+        Register
+        </button>
+    </div>
+
+
+
+);
+}
