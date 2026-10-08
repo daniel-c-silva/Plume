@@ -1,11 +1,13 @@
 import psycopg2
 
 DB_config = {
-    "host": "localhost",
-    "port":"5433",
-    "database": "postgres",
-    "user": "postgres" 
+    "database": "plume_db",
+    "user": "postgres",       # Must be "user", NOT "username"
+    "password": "1234",
+    "host": "localhost",      # Must be "host", NOT "server"
+    "port": "5433"            # Remove "name" and "Driver" completely
 }
+
 
 def init_db():
     conn = psycopg2.connect(**DB_config)
