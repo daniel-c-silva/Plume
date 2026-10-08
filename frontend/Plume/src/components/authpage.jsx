@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Register from "./register";
+import plumeLogo from "../assets/plume-app-icon.svg";
 
 export default function Authpage() 
 {
@@ -7,6 +8,12 @@ export default function Authpage()
     const   [password, setPassword] = useState('');
     const   [message, setMessage] = useState('');
     const   [page, setPage] = useState('login');
+
+    if  (page === 'register')
+    {
+        return <Register/>;
+    }
+
 
     const   handleSubmit = async (currentVal) => {
         currentVal.preventDefault();
@@ -21,15 +28,16 @@ export default function Authpage()
         setMessage(data.message || data.error);
     }
 
-
-    if  (page === 'register')
-    {
-        return <Register/>;
-    }
-
 return (
     <div className="login-cont">
-        <h1>Login</h1>
+        <img
+            src={plumeLogo}
+            alt="Plume"
+            className="plume-logo"
+        />
+
+    <h1>Welcome Back</h1>
+    <p>Sign in to your account to continue</p>
         <form onSubmit={handleSubmit} className="login-form">
 
             <div className="form-group">

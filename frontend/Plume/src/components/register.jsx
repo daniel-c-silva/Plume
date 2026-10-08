@@ -1,9 +1,16 @@
 import { useState } from "react";
+import Authpage from "./authpage";
 
 export default function Register() {
     const   [username, setUserName] = useState('');
     const   [password, setPassword] = useState('');
     const   [message, setMessage] = useState('');
+    const   [page, setPage] = useState('');
+
+    if  (page === 'authPage')
+    {
+        return <Authpage/>
+    }
 
     const   handleSubmit = async (currentVal) => {
         currentVal.preventDefault();
@@ -50,6 +57,9 @@ export default function Register() {
                 <button type="submit" className="submit-button">Submit</button>
             </form>
             {message && <p className="feedback-message">{message}</p>}
+
+            <hr />
+            <button onClick={() => setPage('authPage')}>Back to Login</button>
         </div>
     );
 }
