@@ -31,7 +31,7 @@ def init_db():
         id  SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
         question TEXT NOT NULL,
-        user_answer TEXT NOT NULL
+        user_answer TEXT UNIQUE NOT NULL
         );
         '''
     )
