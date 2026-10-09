@@ -75,7 +75,7 @@ def login():
         if (check_password_hash(hashed_password, password)): # we use chck password hash to see if it matches the current recieved
             return jsonify({"message": "Login sucessfull", "User": user_id}), 200
         else:
-            return jsonify({"error": "password did not match the user's"})
+            return jsonify({"error": "password did not match the user's"}), 401
     except Exception as e:
         if conn:
             conn.rollback()
@@ -91,7 +91,7 @@ def answer():
     data = request.get_json() # get data
 
     if  (not data):
-        return jsonify({"error": "Nothing was sent"}), 300
+        return jsonify({"error": "Nothing was sent"}), 400
 
     user_id = data.get('user_id') # we get the user question and answer so we can look at it later
     question = data.get('question')
@@ -105,7 +105,7 @@ def answer():
         conn, cursor = get_db()
 
         cursor.execute( # increment the amount of times the user has answered a question
-            ''''
+            '''
             UPDATE "user" 
             SET questions_answered = questions_answered + 1
             WHERE id = %s;
@@ -114,7 +114,7 @@ def answer():
         )
 
         cursor.execute( # save the data into our answers table for the specifc user id
-            ''''
+            '''
             INSERT INTO "answers" (user_id, question, user_answer)
             VALUES (%s, %s, %s);
             ''',

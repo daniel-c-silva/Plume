@@ -360,3 +360,214 @@ transition: none !important;
     height: 75px;
     opacity: 80%;
 }
+
+/* ==========================================
+PLUME — DARK MODE (DAILY CONTAINER)
+========================================== */
+
+/* Dark Theme Root Variables Overrides for Dark Pages */
+.daily-cont {
+  --plume-dark-bg: #0d0a1a;
+  --plume-dark-card: rgba(22, 18, 41, 0.75);
+  --plume-dark-border: rgba(166, 154, 251, 0.18);
+  --plume-dark-text: #f0eeff;
+  --plume-dark-muted: #a69ebd;
+  --plume-dark-input-bg: rgba(25, 20, 48, 0.6);
+  --plume-dark-input-border: rgba(166, 154, 251, 0.22);
+}
+
+/* Base layout adapt for dark mode body when daily container is present */
+body:has(.daily-cont) {
+  background:
+    radial-gradient(
+      ellipse at 12% 10%,
+      rgba(111, 91, 232, 0.25),
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse at 88% 90%,
+      rgba(166, 154, 251, 0.12),
+      transparent 40%
+    ),
+    #0c0a18;
+  color: var(--plume-dark-text);
+}
+
+/* DAILY CARD CONTAINER */
+
+.daily-cont {
+  width: 100%;
+  max-width: 480px;
+  padding: 42px 36px 36px;
+
+  background: var(--plume-dark-card);
+  border: 1px solid var(--plume-dark-border);
+  border-radius: 28px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    0 4px 20px rgba(111, 91, 232, 0.15);
+
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+
+  text-align: center;
+  animation: plume-enter 0.45s ease-out both;
+}
+
+/* HEADINGS & TEXT */
+
+.daily-cont h1 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.daily-question {
+  margin: 0 0 28px;
+  color: var(--plume-dark-muted);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* FORM & TEXTAREA */
+
+.daily-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.daily-form textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  resize: vertical;
+
+  color: #ffffff;
+  background: var(--plume-dark-input-bg);
+  border: 1px solid var(--plume-dark-input-border);
+  border-radius: 16px;
+  outline: none;
+
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.daily-form textarea::placeholder {
+  color: #6d6688;
+}
+
+.daily-form textarea:hover {
+  border-color: rgba(166, 154, 251, 0.4);
+}
+
+.daily-form textarea:focus {
+  background: rgba(31, 25, 59, 0.8);
+  border-color: var(--plume-primary);
+  box-shadow: 0 0 0 4px rgba(111, 91, 232, 0.25);
+}
+
+/* SUBMIT BUTTON */
+
+.daily-cont .submit-button {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 14px;
+
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    #8d7bfb 0%,
+    #6f5be8 52%,
+    #5943db 100%
+  );
+
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+
+  box-shadow: 0 8px 22px rgba(111, 91, 232, 0.35);
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.daily-cont .submit-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(111, 91, 232, 0.48);
+}
+
+.daily-cont .submit-button:active {
+  transform: scale(0.985);
+}
+
+/* DIVIDER & LOGOUT */
+
+.daily-divider {
+  height: 1px;
+  margin: 28px 0 22px;
+  border: none;
+  background: var(--plume-dark-border);
+}
+
+.daily-cont .logout-button {
+  min-width: 120px;
+  min-height: 44px;
+  padding: 10px 20px;
+
+  color: var(--plume-lavender);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--plume-dark-border);
+  border-radius: 14px;
+
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.daily-cont .logout-button:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(166, 154, 251, 0.4);
+  transform: translateY(-1px);
+}
+
+.daily-cont .logout-button:active {
+  transform: scale(0.985);
+}
+
+/* FEEDBACK MESSAGE */
+
+.daily-cont .feedback-message {
+  margin: 18px 0 0;
+  padding: 12px 16px;
+
+  color: #d1c8ff;
+  background: rgba(111, 91, 232, 0.18);
+  border: 1px solid rgba(166, 154, 251, 0.3);
+  border-radius: 13px;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
