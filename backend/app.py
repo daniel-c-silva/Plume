@@ -104,6 +104,20 @@ def answer():
     try:
         conn, cursor = get_db()
 
+
+        cursor.execute( # save the data into our answers table for the specifc user id
+            '''
+            INSERT INTO "answers" (user_id, question, user_answer)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (user_id, question) DO NOTHING;
+            ''',
+            (user_id, question, user_answer)
+        )
+
+        if (cursor.rowcount == 0): # nothing was inserted so they already asnwered
+            return jsonify({"error": "You already answered today's question."}), 400
+
+
         cursor.execute( # increment the amount of times the user has answered a question
             '''
             UPDATE "user" 
@@ -112,15 +126,6 @@ def answer():
             ''',
             (user_id, )
         )
-
-        cursor.execute( # save the data into our answers table for the specifc user id
-            '''
-            INSERT INTO "answers" (user_id, question, user_answer)
-            VALUES (%s, %s, %s);
-            ''',
-            (user_id, question, user_answer)
-        )
-
 
         conn.commit()
 
