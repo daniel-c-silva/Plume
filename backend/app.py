@@ -87,7 +87,7 @@ def login():
 
 # ! daily answer route
 @app.route('/daily', methods=['POST'])
-def answer():
+def daily():
     data = request.get_json() # get data
 
     if  (not data):
@@ -142,6 +142,45 @@ def answer():
     finally:
         if conn:
             conn.close()
+
+@app.route('/answers', method=['POST'])
+def get_data():
+    data = request.get_json()
+
+    if (not data):
+        return jsonify({"error": "could not find user id"})
+
+    user_id = data.get('user_id')
+
+    conn = None
+
+    try:
+        conn, cursor = get_db()
+
+        cursor.execute(
+            'SELECT question, user_answer FROM "answers" WHERE user_id = %s;',
+            (user_id, )
+        )
+
+        questiondata = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        question = questiondata[0]
+        answer = questiondata[1]
+
+        if (question and answer):
+            return jsonify({"question asked": question, "user's answer": answer})
+        
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+    finally:
+        if conn:
+            conn.close()
+
+
 
 
 if  __name__ == "__main__":
