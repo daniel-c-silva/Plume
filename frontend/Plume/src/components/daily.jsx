@@ -1,14 +1,20 @@
 import { useState } from "react";
 import { useAuth } from "../AuthContext";
 import plumeLogo from "../assets/plume-app-icon.svg";
+import Answered from "./answered";
 
 export default function Daily() 
 {
     const   {userId, logout} = useAuth();
     const   [answer, setAnswer] = useState('');
     const   [message, setMessage] = useState('');
+    const   [page, setPage] = useState('');
 
-    const   question = "what's your current favourite word?";
+        if  (page === 'answered')
+        {
+            return <Answered/>
+        }
+    const   question = "do you have a crush on someone?";
 
     const   handleSubmit = async (currentVal) => {
         currentVal.preventDefault();
@@ -52,6 +58,7 @@ return (
             <button type="button" onClick={logout} className="logout-button">
                 Log out
             </button>
+            <button type="button" onClick={() => setPage('answered')}>see our answers</button>
         </div>
     );
 }

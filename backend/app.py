@@ -143,14 +143,15 @@ def daily():
         if conn:
             conn.close()
 
-@app.route('/answers', method=['POST'])
+# ! get data 
+@app.route('/answers', methods=['POST'])
 def get_data():
-    data = request.get_json()
+    data = request.get_json() # get data from frontend
 
     if (not data):
         return jsonify({"error": "could not find user id"})
 
-    user_id = data.get('user_id')
+    user_id = data.get('user_id') # get user
 
     conn = None
 
@@ -158,20 +159,19 @@ def get_data():
         conn, cursor = get_db()
 
         cursor.execute(
-            'SELECT question, user_answer FROM "answers" WHERE user_id = %s;',
+            'SELECT question, user_answer, id FROM "answers" WHERE user_id = %s;',
             (user_id, )
         )
 
-        questiondata = cursor.fetchone()
+        questiondata = cursor.fetchall() # make an array containing question and user
 
-        cursor.close()
+        cursor.close() 
         conn.close()
 
-        question = questiondata[0]
-        answer = questiondata[1]
+        answers = [{"question": i[0], "answer": i[1]} for i in questiondata]
 
-        if (question and answer):
-            return jsonify({"question asked": question, "user's answer": answer})
+        if (questiondata):
+            return jsonify({"answers": answers}) # return the question and answer to the frontend
         
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -179,7 +179,6 @@ def get_data():
     finally:
         if conn:
             conn.close()
-
 
 
 
