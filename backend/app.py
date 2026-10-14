@@ -3,11 +3,47 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from db import get_db, init_db
+import ollama
+from datetime import date
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 CORS(app)
 
+cached_question = None
+question_date = None
+
 init_db() 
+
+
+
+def update_daily_question():
+    global current_question, question_date
+    today = date.today()
+    
+    print(f"Generating new daily question for {today}...")
+    try:
+        response = ollama.chat(
+            model='llama3.2',
+            messages=[{
+                'role': 'system',
+                'content': 'You generate engaging daily icebreaker questions for close friends. Keep it under 15 words.'
+            }, {
+                'role': 'user',
+                'content': 'Give me one fun daily question for today.'
+            }]
+        )
+        current_question = response['message']['content'].strip()
+    except Exception:
+        current_question = "What is on your mind today?"
+        
+    question_date = today
+
+scheduler = BackgroundScheduler() # init and start background scheduler
+update_daily_question() # run imidiatly on start 
+scheduler.add_job(func=update_daily_question, trigger="cron", hour = 0, minute = 0) # schedule for midnight
+scheduler.start
+
 
 # ! registration route
 @app.route('/register', methods=['POST'])
@@ -180,7 +216,12 @@ def get_data():
         if conn:
             conn.close()
 
+# ! generate question
+@app.route('/generate-daily-question', methods=['GET'])
+def get_daily_question():
+    return jsonify({"question": current_question})
 
+    
 
 if  __name__ == "__main__":
     print("Running server...")

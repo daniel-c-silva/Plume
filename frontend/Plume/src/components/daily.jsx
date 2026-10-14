@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
 import plumeLogo from "../assets/plume-app-icon.svg";
 import Answered from "./answered";
@@ -10,11 +10,19 @@ export default function Daily()
     const   [message, setMessage] = useState('');
     const   [page, setPage] = useState('');
 
-        if  (page === 'answered')
-        {
-            return <Answered/>
-        }
-    const   question = "do you have a crush on someone?";
+    const   [question, setQuestion] = useState("Loading question...")
+
+    useEffect(() => {
+        fetch('http://127.0.0.1:5000/generate-daily-question')
+        .then(res => res.json())
+        .then(data => setQuestion(data.question))
+        .catch(() => setQuestion("Whatever is on your mind today!"));
+    } ,[]);
+
+    if  (page === 'answered')
+    {
+        return <Answered/>
+    }
 
     const   handleSubmit = async (currentVal) => {
         currentVal.preventDefault();
