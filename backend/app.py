@@ -5,23 +5,26 @@ import os
 from db import get_db, init_db
 import ollama
 from datetime import date
-from apscheduler.schedulers.background import BackgroundScheduler
+import json
 
 app = Flask(__name__)
 CORS(app)
 
-cached_question = None
-question_date = None
+CACHE_FILE = "daily_question.json"
 
 init_db() 
 
 
 
 def update_daily_question():
-    global current_question, question_date
-    today = date.today()
-    
-    print(f"Generating new daily question for {today}...")
+    today_str = str(date.today())
+
+    # if the cached file exists, check if its from today.
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "r") as f:
+            data = json.load(f)
+            if data.get("date") == today_str:
+                return(data.get("question"))
     try:
         response = ollama.chat(
             model='llama3.2',
@@ -33,17 +36,15 @@ def update_daily_question():
                 'content': 'Give me one fun daily question for today.'
             }]
         )
-        current_question = response['message']['content'].strip()
+        question = response['message']['content'].strip()
     except Exception:
-        current_question = "What is on your mind today?"
+        question = "What is on your mind today?"
+
+    with open(CACHE_FILE, "w") as f:
+        json.dump({"date": today_str, "question": question}, f)
+
+    return question
         
-    question_date = today
-
-scheduler = BackgroundScheduler() # init and start background scheduler
-update_daily_question() # run imidiatly on start 
-scheduler.add_job(func=update_daily_question, trigger="cron", hour = 0, minute = 0) # schedule for midnight
-scheduler.start
-
 
 # ! registration route
 @app.route('/register', methods=['POST'])
@@ -219,7 +220,8 @@ def get_data():
 # ! generate question
 @app.route('/generate-daily-question', methods=['GET'])
 def get_daily_question():
-    return jsonify({"question": current_question})
+    question = update_daily_question()
+    return jsonify({"question": question})
 
     
 
