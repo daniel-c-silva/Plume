@@ -1,15 +1,3 @@
 {
-    "sqltools.connections": [
-        {
-            "ssh": "Disabled",
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5433,
-            "askForPassword": true,
-            "driver": "PostgreSQL",
-            "name": "Plume",
-            "database": "plume_db",
-            "username": "postgres"
-        }
-    ]
+    "sqltools.connections": []
 }

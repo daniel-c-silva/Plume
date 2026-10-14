@@ -5,7 +5,7 @@ DB_config = {
     "user": "postgres",       # Must be "user", NOT "username"
     "password": "1234",
     "host": "localhost",      # Must be "host", NOT "server"
-    "port": "5433"            # Remove "name" and "Driver" completely
+    "port": "5432"            # Remove "name" and "Driver" completely
 }
 
 
