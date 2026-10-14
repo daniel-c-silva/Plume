@@ -10,19 +10,21 @@ app = Flask(__name__)
 CORS(app)
 init_db()
 
+# ! daily question updater (HELPERFUNCTION FOR DAILY QUESTION ROUTE)
 def update_daily_question():
-    today_str = str(date.today())
+    today_str = str(date.today()) # define date to know if new question is needed
     conn = None
+    # * check if the question has been generated today!
     try:
         conn, cursor = get_db()
         cursor.execute(
             'SELECT question FROM "daily_question" WHERE question_date = %s;', (today_str,)
         )
         stored_question = cursor.fetchone()
-        if (stored_question):
+        if (stored_question): # * if it has
             return stored_question[0] #  Extracts the plain string text from the database tuple array
             
-        try:
+        try: # else, generate it using ollama
             response = ollama.chat(
                 model='llama3.2',
                 messages=[{
@@ -35,9 +37,9 @@ def update_daily_question():
             )
             question = response['message']['content'].strip()
         except Exception:
-            question = "What is on your mind today?"
+            question = "What is on your mind today?" # fall back question.
             
-        try: #  Handles insert safely to avoid needing external unique constraint configurations
+        try: #  save the question into the questions data base associated to the date
             cursor.execute(
                 '''
                 INSERT INTO "daily_question" (question_date, question)
@@ -49,12 +51,8 @@ def update_daily_question():
         except Exception:
             if conn:
                 conn.rollback()
-            
-        cursor.execute(
-            'SELECT question FROM "daily_question" WHERE question_date = %s;', (today_str,)
-        )
-        new_question = cursor.fetchone()
-        return new_question[0] if new_question else question # ! CHANGED: Extracts the text string out of the tuple layout
+
+        return question # * return the question so the app route can use it and send it back to the frontend
     finally:
         if conn:
             conn.close()
@@ -65,8 +63,10 @@ def register_user():
     data = request.get_json()
     username = data.get('username') # look for username and password
     password = data.get('password')
+
     if ((not username) or (not password)):
         return jsonify({"error": "Missing information"}), 400
+    
     conn = None
     try:
         hashed_password = generate_password_hash(password) # use genarate password hash to encrypt it
@@ -134,12 +134,12 @@ def daily():
     try:
         conn, cursor = get_db()
         
-        # ! CHANGED: Check if the user already answered this question manually to avoid ON CONFLICT database restrictions
+        # * Check if the user already answered this question manually to avoid ON CONFLICT database restrictions
         cursor.execute(
             'SELECT 1 FROM "answers" WHERE user_id = %s AND question = %s;',
             (user_id, question)
         )
-        if cursor.fetchone():
+        if cursor.fetchone(): # if the answer existed already in the db
             return jsonify({"error": "You already answered today's question."}), 400
 
         cursor.execute( # save the data into our answers table for the specifc user id
@@ -169,7 +169,7 @@ def daily():
         if conn:
             conn.close()
 
-# ! get data
+# ! get data from asnweres
 @app.route('/answers', methods=['POST'])
 def get_data():
     data = request.get_json() # get data from frontend
@@ -201,5 +201,5 @@ def get_daily_question():
     return jsonify({"question": question})
 
 if __name__ == "__main__":
-    print("Running server...")
+    print("empezando tiooooo arriba...")
     app.run(debug=True)
