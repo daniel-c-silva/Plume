@@ -21,6 +21,8 @@
 
 ## Setup
 
+Prerequisites: Python, PostgreSQL, Ollama (with the llama3.2 model), and Node.js with npm.
+
 ### Backend Setup
 ```
 cd backend
