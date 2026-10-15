@@ -14,4 +14,4 @@ else:
 STORAGE = os.path.join(HERE, ".plume-data")  # keeps localStorage between runs
 
 webview.create_window("Plume", URL, width=420, height=760, min_size=(360, 600))
-webview.start(private_mode=False, storage_path=STORAGE, http_server=True)   
+webview.start(private_mode=False, storage_path=STORAGE, http_server=True)
