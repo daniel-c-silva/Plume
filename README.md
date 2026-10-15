@@ -18,6 +18,7 @@
 ```
 - **Frontend:** JavaScript > React(Vite)
 - **Backend:** Python > Flask + Flask-CORS and Werkzeug(for the password hashing).
+- **Database and AI** > PostgreSQL (Relational database) and Ollama (Local `llama3.2` LLM orchestration).
 ```
 
 ## Setup
