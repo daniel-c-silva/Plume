@@ -1,6 +1,6 @@
 # Plume
 ## Social App that allows friends to answer daily questions together and keep an archive of their answers.
-![Plume Demo](frontend/Plume/src/assets/PlumeDemo.gif)
+![Plume Demo](frontend/Plume/src/assets/media/PlumeDemo.gif)
 
 ## Core Idea:
 
