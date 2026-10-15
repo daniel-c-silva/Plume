@@ -176,6 +176,7 @@ button {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  width: 100%;
 }
 
 button:hover {
@@ -311,3 +312,10 @@ hr {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+.logout-button {
+    margin-top: 0px;
+    width: 50%;
+}
+
+

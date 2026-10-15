@@ -63,10 +63,12 @@ return (
 
             <hr className="daily-divider" />
 
+            <button type="button" onClick={() => setPage('answered')}>see our answers</button>
+
             <button type="button" onClick={logout} className="logout-button">
                 Log out
             </button>
-            <button type="button" onClick={() => setPage('answered')}>see our answers</button>
+            
         </div>
     );
 }
