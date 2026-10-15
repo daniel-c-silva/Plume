@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
+import Daily from "./daily";
 
 export default function Answered(){
 
     const   {userId, logout} = useAuth();
     const   [answers, setAnswers] = useState([]);
     const   [message, setMessage] = useState('');
+    const   [page, setPage] = useState('');
 
     useEffect(() => {
         const   getData = async () => {
@@ -22,6 +24,11 @@ export default function Answered(){
         getData();
     }, [userId]);
 
+    if (page === "Daily")
+    {
+        return <Daily/>
+    }
+
     return(
         <div className="daily-cont">
             <h1>Your answers</h1>
@@ -34,6 +41,11 @@ export default function Answered(){
             ))}
 
             {message && <p className="feedback-message">{message}</p>}
+
+
+            <button type="button" onClick={() => setPage('Daily')} className="setpage-button">
+                Back to Daily Question
+            </button>
 
             <button type="button" onClick={logout} className="logout-button">
                 Log out
