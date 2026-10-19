@@ -200,6 +200,133 @@ def get_daily_question():
     question = update_daily_question()
     return jsonify({"question": question})
 
+@app.route('/send-friend-request', methods=['POST'])
+def add_friend():
+    data = request.get_json() # get data from frontend
+    if not data:
+        return jsonify({"error": "No data"}), 400
+    
+    user_id = data.get('user_id') # sender 
+    friend_username = data.get('friend_username') # friend username reciever of the request
+
+    if not user_id or not friend_username:
+        return jsonify({"error": "missing user id or friend username"}), 400
+
+    conn = None
+
+    try:
+        conn, cursor = get_db()
+
+        # * look up friend's id using their username
+        cursor.execute('SELECT id FROM "user" WHERE username = %s', (friend_username, ))
+        friend_row = cursor.fetchone() 
+
+        if not friend_row:
+            return jsonify({"error": "could not find friend id"}), 400
+
+        friend_id = friend_row[0] # get the id from the list we fetched from the database.
+
+        # prevent the user from adding themselves lmao
+        if user_id == friend_id:
+            return jsonify({"error": "why are you trying to add yourself as a friend?"})
+
+        # * set as pending
+        cursor.execute(
+            '''
+        INSERT INTO "friends" (user_id, friend_id, status)
+        VALUES(%s, %s, 'pending...')
+        ON CONFLICT DO NOTHING;
+            ''',
+        (user_id, friend_id)
+        )
+        conn.commit()
+
+        return jsonify({"message": "friend request sent sucessfully"}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        if conn:
+            conn.close()
+        
+
+@app.route('/accept-friend-request', methods=['POST'])
+def accept_friend_request():
+    data = request.get_json()
+    user_id = data.get('user_id') # Reciever
+    sender_username = data.get('sender_username') # sender
+
+    if not user_id or not sender_username:
+        return jsonify({"error": "Missing user_id or sender_id"}), 400
+
+    conn = None
+    try:
+        conn, cursor = get_db()
+
+        # Look up the sender's ID using their username
+        cursor.execute('SELECT id FROM "user" WHERE username = %s;', (sender_username,))
+        sender_row = cursor.fetchone()
+
+        if not sender_row:
+            return jsonify({"error": "User does not exist"}), 404
+
+        sender_id = sender_row[0]
+
+        # change the status to accepted
+        cursor.execute(
+            '''
+            UPDATE "friends"
+            SET status = 'accepted'
+            WHERE user_id = %s AND friend_id = %s AND status = 'pending...';
+            ''',
+            (sender_id, user_id)
+        )
+        conn.commit()
+        return jsonify({"message": f"friend request accepted! you're friends with {sender_username}"}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        return jsonify({"error": str(e)})
+
+    finally:
+        if conn:
+            conn.close()
+
+
+@app.route('/pending-requests', methods=['POST'])
+def get_pending_requests():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    conn = None
+    try:
+        conn, cursor = get_db()
+        cursor.execute(
+            '''
+        SELECT username 
+        FROM "user" 
+        WHERE id IN (
+        SELECT user_id 
+        FROM "friends" 
+        WHERE friend_id = %s AND status = 'pending...');
+            ''',
+            (user_id,)
+        )
+        requests_data = cursor.fetchall()
+        usernames = [r[0] for r in requests_data]
+        return jsonify({"pending": usernames}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn:
+            conn.close()
+
 if __name__ == "__main__":
     print("empezando tiooooo arriba...")
     app.run(debug=True)

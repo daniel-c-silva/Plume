@@ -35,6 +35,18 @@ def init_db():
         );
         '''
     )
+    # ? users friends
+    cursor.execute(
+        '''
+    CREATE TABLE IF NOT EXISTS "friends"(
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
+        friend_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
+        status TEXT DEFAULT 'pending...' NOT NULL,
+        CONSTRAINT unique_friendship UNIQUE (user_id, friend_id)
+    );
+        '''
+    )
     conn.commit()
     cursor.close()
     conn.close()
