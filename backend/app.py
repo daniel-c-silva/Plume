@@ -12,17 +12,17 @@ init_db()
 
 # ! daily question updater (HELPERFUNCTION FOR DAILY QUESTION ROUTE)
 def update_daily_question():
-    today_str = str(date.today()) # define date to know if new question is needed
+    today_str = str(date.today()) # todaystr is equal to the date it is today.
     conn = None
-    # * check if the question has been generated today!
-    try:
+    #  check if the question has been generated today
+    try: # we first try:
         conn, cursor = get_db()
         cursor.execute(
             'SELECT question FROM "daily_question" WHERE question_date = %s;', (today_str,)
         )
         stored_question = cursor.fetchone()
         if (stored_question): # * if it has
-            return stored_question[0] #  Extracts the plain string text from the database tuple array
+            return stored_question[0] #  Extracts the string from the database array.
             
         try: # else, generate it using ollama
             response = ollama.chat(
@@ -39,7 +39,7 @@ def update_daily_question():
         except Exception:
             question = "What is on your mind today?" # fall back question.
             
-        try: #  save the question into the questions data base associated to the date
+        try: # then, save the question into the questions table, associated to the date
             cursor.execute(
                 '''
                 INSERT INTO "daily_question" (question_date, question)
@@ -57,10 +57,13 @@ def update_daily_question():
         if conn:
             conn.close()
 
+
+
+
 # ! registration route
 @app.route('/register', methods=['POST'])
 def register_user():
-    data = request.get_json()
+    data = request.get_json() # get data from frontend
     username = data.get('username') # look for username and password
     password = data.get('password')
 
@@ -80,16 +83,19 @@ def register_user():
         return jsonify({"message": "User profile created sucessfully"})
     except Exception as e:
         if conn:
-            conn.rollback()
+            conn.rollback() # if there was an error go back to where the database was
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:
             conn.close()
 
+
+
+
 # ! login route
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.get_json() # get data from forntend
     username = data.get('username') # look for username and password in data
     password = data.get('password')
     if ((not username) or (not password)):
@@ -98,7 +104,7 @@ def login():
     try:
         conn, cursor = get_db()
         cursor.execute (
-            'SELECT id, password_hash FROM "user" WHERE username = %s;', (username, )
+            'SELECT id, password_hash FROM "user" WHERE username = %s;', (username, ) # get the username id to compare their info to the data base's
         )
         user = cursor.fetchone() # user is now an array full of what we pulled
         cursor.close()
@@ -119,35 +125,38 @@ def login():
         if conn:
             conn.close()
 
+
+
+
 # ! daily answer route
 @app.route('/daily', methods=['POST'])
 def daily():
-    data = request.get_json() # get data
+    data = request.get_json() # get data from frontend
     if (not data):
         return jsonify({"error": "Nothing was sent"}), 400
     user_id = data.get('user_id') # we get the user question and answer so we can look at it later
     question = data.get('question')
     user_answer = data.get('answer')
-    if (not all([user_id, question, user_answer])):
-        return jsonify({"error": "Missing required data"}), 400
+    if (not all([user_id, question, user_answer])): # if not all data was there
+        return jsonify({"error": "Missing required data"}), 400 # it would be required to fill the table so we discard it and throw an error
     conn = None
-    try:
+    try: 
         conn, cursor = get_db()
         
         # * Check if the user already answered this question manually to avoid ON CONFLICT database restrictions
         cursor.execute(
             'SELECT 1 FROM "answers" WHERE user_id = %s AND question = %s;',
-            (user_id, question)
+            (user_id, question) 
         )
         if cursor.fetchone(): # if the answer existed already in the db
             return jsonify({"error": "You already answered today's question."}), 400
 
-        cursor.execute( # save the data into our answers table for the specifc user id
+        cursor.execute( # save the data into our answers table for the specifc user id if it was not answered before.
             '''
             INSERT INTO "answers" (user_id, question, user_answer)
-            VALUES (%s, %s, %s);
+            VALUES (%s, %s, %s); 
             ''',
-            (user_id, question, user_answer)
+            (user_id, question, user_answer) 
         )
         cursor.execute( # increment the amount of times the user has answered a question
             '''
@@ -160,7 +169,7 @@ def daily():
         conn.commit()
         cursor.close()
         conn.close()
-        return jsonify({"message": "Daily data was sucessfully recorded!"}), 200
+        return jsonify({"message": "Daily data was sucessfully recorded!"}), 200 
     except Exception as e:
         if conn:
             conn.rollback()
@@ -169,12 +178,17 @@ def daily():
         if conn:
             conn.close()
 
+
+
+
 # ! get data from asnweres
 @app.route('/answers', methods=['POST'])
 def get_data():
     data = request.get_json() # get data from frontend
+
     if (not data):
         return jsonify({"error": "could not find user id"})
+    
     user_id = data.get('user_id') # get user
     conn = None
     try:
@@ -185,7 +199,7 @@ def get_data():
         questiondata = cursor.fetchall() # make an array containing question and user
         cursor.close()
         conn.close()
-        answers = [{"question": i[0], "answer": i[1]} for i in questiondata]
+        answers = [{"question": questiondata[0], "answer": questiondata[1]}] # the first index of the question data array is the question while the second is the asnwer
         if (questiondata):
             return jsonify({"answers": answers}) # return the question and answer to the frontend
     except Exception as e:
@@ -194,12 +208,19 @@ def get_data():
         if conn:
             conn.close()
 
+
+
+
 # ! generate question
 @app.route('/generate-daily-question', methods=['GET'])
 def get_daily_question():
-    question = update_daily_question()
+    question = update_daily_question() # calls the first function of the program, the one that generates the question itself.
     return jsonify({"question": question})
 
+
+
+
+# ! route to send friend requests
 @app.route('/send-friend-request', methods=['POST'])
 def add_friend():
     data = request.get_json() # get data from frontend
@@ -230,7 +251,7 @@ def add_friend():
         if user_id == friend_id:
             return jsonify({"error": "why are you trying to add yourself as a friend?"})
 
-        # * set as pending
+        #  set request as pending.
         cursor.execute(
             '''
         INSERT INTO "friends" (user_id, friend_id, status)
@@ -253,6 +274,9 @@ def add_friend():
             conn.close()
         
 
+
+
+# ! route so you can accept a friend request
 @app.route('/accept-friend-request', methods=['POST'])
 def accept_friend_request():
     data = request.get_json()
@@ -297,10 +321,13 @@ def accept_friend_request():
             conn.close()
 
 
+
+
+#! route so you can visualize your requests.
 @app.route('/pending-requests', methods=['POST'])
 def get_pending_requests():
-    data = request.get_json()
-    user_id = data.get('user_id')
+    data = request.get_json() # request data from forntend
+    user_id = data.get('user_id') # get the user id from it
     if not user_id:
         return jsonify({"error": "Missing user_id"}), 400
 
@@ -318,9 +345,53 @@ def get_pending_requests():
             ''',
             (user_id,)
         )
-        requests_data = cursor.fetchall()
-        usernames = [r[0] for r in requests_data]
+        requests_data = cursor.fetchall() 
+        usernames = requests_data[0]
         return jsonify({"pending": usernames}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+
+
+# ! get user and friends answers for daily questions
+@app.route('/friends-answers', methods=['POST'])
+def get_friends_answers():
+    data = request.get_json()
+    if not data or 'user_id' not in data:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    user_id = data.get('user_id')
+    conn = None
+    try:
+        conn, cursor = get_db()
+        # Fetch answers written by the user OR AAND any of their accepted friends
+        cursor.execute(
+            '''
+            SELECT u.username, a.question, a.user_answer 
+            FROM "answers" a
+            JOIN "user" u ON a.user_id = u.id
+            WHERE a.user_id = %s 
+               OR a.user_id IN (
+                   SELECT friend_id FROM "friends" WHERE user_id = %s AND status = 'accepted'
+                   UNION
+                   SELECT user_id FROM "friends" WHERE friend_id = %s AND status = 'accepted'
+               );
+            ''',
+            (user_id, user_id, user_id)
+        )
+        data_rows = cursor.fetchall()
+        
+        feed = [
+            {"username": row[0], "question": row[1], "answer": row[2]}
+            for row in data_rows
+        ]
+        
+        return jsonify({"feed": feed}), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
 import plumeLogo from "../assets/plume-app-icon.svg";
 import Answered from "./answered";
+import FriendsAnswers from "./FriendsAnswers";
+import Friends from "./friends";
+
 
 export default function Daily() 
 {
@@ -23,6 +26,17 @@ export default function Daily()
     {
         return <Answered/>
     }
+
+    if (page === 'friends-feed')
+    {
+        return <FriendsAnswers/>
+    }
+
+    if (page === "Friends")
+    {
+        return <Friends/>
+    }
+    
 
     const   handleSubmit = async (currentVal) => {
         currentVal.preventDefault();
@@ -63,8 +77,11 @@ return (
 
             <hr className="daily-divider" />
 
-            <button type="button" onClick={() => setPage('answered')} className="setpage-button">see our answers</button>
-
+            <button type="button" onClick={() => setPage('answered')} className="setpage-button">see my answers</button>
+            <button type="button" onClick={() => setPage('friends-feed')} className="setpage-button">see our answers</button>
+            <button type="button" onClick={() => setPage('Friends')} className="setpage-button">
+                Add Friends
+            </button>
             <button type="button" onClick={logout} className="logout-button">
                 Log out
             </button>

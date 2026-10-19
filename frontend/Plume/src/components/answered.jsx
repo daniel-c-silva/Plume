@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import Daily from "./daily";
-import Friends from "./friends";
+
 
 export default function Answered(){
 
@@ -30,11 +30,6 @@ export default function Answered(){
         return <Daily/>
     }
 
-    if (page === "Friends")
-    {
-        return <Friends/>
-    }
-
     return(
         <div className="daily-cont">
             <h1>Your answers</h1>
@@ -57,9 +52,6 @@ export default function Answered(){
                 Log out
             </button>
 
-            <button type="button" onClick={() => setPage('Friends')} className="setpage-button">
-                Add Friends
-            </button>
         </div>
     );
 }

@@ -10,7 +10,7 @@ export default function Friends() {
   const [page, setPage] = useState('');
 
   useEffect(() => {
-    fetch('http://127.0.0', {
+    fetch('http://127.0.0.1:5000/pending-requests', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId })
@@ -25,7 +25,7 @@ export default function Friends() {
 
   const handleSendRequest = async (e) => {
     e.preventDefault();
-    const res = await fetch('http://127.0.0', {
+    const res = await fetch('http://127.0.0.1:5000/send-friend-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId, friend_username: friendUsername })
@@ -36,7 +36,7 @@ export default function Friends() {
   };
 
   const handleAccept = async (senderUsername) => {
-    const res = await fetch('http://127.0.0', {
+    const res = await fetch('http://127.0.0.1:5000/accept-friend-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId, sender_username: senderUsername })
