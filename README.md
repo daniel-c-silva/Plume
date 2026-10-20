@@ -11,7 +11,7 @@
 * User has an archive with all the questions he answered and what was answered,
 * * Friend requests,
 * Access to friend's archive.
-
+![Plume Friends Demo](frontend/Plume/src/assets/media/Plumefriendsdemo.gif)
 
 ## Tech Stack
 ```
@@ -19,7 +19,6 @@
 - **Backend:** Python > Flask + Flask-CORS and Werkzeug(for the password hashing).
 - **Database and AI** > PostgreSQL (Relational database) and Ollama (Local `llama3.2` LLM orchestration).
 ```
-![Plume Friends Demo](frontend/Plume/src/assets/media/Plumefriendsdemo.gif)
 
 ## Setup
 
