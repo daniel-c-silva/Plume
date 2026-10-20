@@ -9,7 +9,7 @@
 * User logs in,
 * User gets daily question and answers,
 * User has an archive with all the questions he answered and what was answered,
-* * Friend requests,
+* Friend requests,
 * Access to friend's archive.
 ![Plume Friends Demo](frontend/Plume/src/assets/media/Plumefriendsdemo.gif)
 
