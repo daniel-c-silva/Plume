@@ -199,7 +199,7 @@ def get_data():
         questiondata = cursor.fetchall() # make an array containing question and user
         cursor.close()
         conn.close()
-        answers = [{"question": questiondata[0], "answer": questiondata[1]}] # the first index of the question data array is the question while the second is the asnwer
+        answers = [{"question": questiondata[0], "answer": questiondata[1]} for row in questiondata] # the first index of the question data array is the question while the second is the asnwer
         if (questiondata):
             return jsonify({"answers": answers}) # return the question and answer to the frontend
     except Exception as e:
@@ -346,7 +346,7 @@ def get_pending_requests():
             (user_id,)
         )
         requests_data = cursor.fetchall() 
-        usernames = requests_data[0]
+        usernames = [row[0] for row in requests_data]
         return jsonify({"pending": usernames}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
