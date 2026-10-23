@@ -29,11 +29,14 @@ def update_daily_question():
                 model='llama3.2',
                 messages=[{
                     'role': 'system',
-                    'content': 'You generate engaging daily icebreaker questions for close friends. Keep it under 15 words.'
+                    'content': 'You generate engaging daily icebreaker questions for close friends. Keep it under 15 words. Make it unique.'
                 }, {
                     'role': 'user',
-                    'content': 'Give me one fun daily question for today.'
-                }]
+                    'content': f'Give me one fun daily question for today, {today_str}.' # * Added today_str so Ollama knows the date changed? cuz llms are deterministic this is but a test.
+                }],
+                options={
+                    'temperature': 0.8 # * Added temperature for creativity so it doesn't repeat the same thing, which was happening...
+                }
             )
             question = response['message']['content'].strip()
         except Exception:
@@ -187,7 +190,7 @@ def get_data():
     data = request.get_json() # get data from frontend
 
     if (not data):
-        return jsonify({"error": "could not find user id"})
+        return jsonify({"error": "could not find user id"}), 400
     
     user_id = data.get('user_id') # get user
     conn = None
@@ -199,11 +202,13 @@ def get_data():
         questiondata = cursor.fetchall() # make an array containing question and user
         cursor.close()
         conn.close()
-        answers = [{"question": questiondata[0], "answer": questiondata[1]} for row in questiondata] # the first index of the question data array is the question while the second is the asnwer
-        if (questiondata):
-            return jsonify({"answers": answers}) # return the question and answer to the frontend
+        
+        # Using `row[0]` and `row[1]` inside the loop instead of hardcoding indexes # fixed...
+        answers = [{"question": row[0], "answer": row[1], "id": row[2]} for row in questiondata] 
+        
+        return jsonify({"answers": answers}), 200 # * Added status code 200
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}), 500 # * Added status code 500
     finally:
         if conn:
             conn.close()
@@ -249,7 +254,7 @@ def add_friend():
 
         # prevent the user from adding themselves lmao
         if user_id == friend_id:
-            return jsonify({"error": "why are you trying to add yourself as a friend?"})
+            return jsonify({"error": "why are you trying to add yourself as a friend?"}), 400
 
         #  set request as pending.
         cursor.execute(
@@ -314,7 +319,7 @@ def accept_friend_request():
     except Exception as e:
         if conn:
             conn.rollback()
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}), 500
 
     finally:
         if conn:
